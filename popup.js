@@ -1,18 +1,22 @@
+// Load existing keywords into the input field on popup load
+document.addEventListener("DOMContentLoaded", () => {
+  chrome.storage.sync.get("blockedWords", ({ blockedWords }) => {
+    if (blockedWords && blockedWords.length > 0) {
+      document.getElementById("keywords").value = blockedWords.join(", ");
+    }
+  });
+});
+
+// Save updated keywords when "Done" is clicked
 document.getElementById("save").addEventListener("click", () => {
-  const newKeywords = document
+  const keywords = document
     .getElementById("keywords")
     .value.split(",")
-    .map((word) => word.trim());
+    .map((word) => word.trim())
+    .filter((word) => word.length > 0); // Remove empty entries
 
-  // Fetch existing keywords and append new ones
-  chrome.storage.sync.get("blockedWords", ({ blockedWords }) => {
-    const updatedKeywords = blockedWords
-      ? [...new Set([...blockedWords, ...newKeywords])] // Combine and remove duplicates
-      : newKeywords;
-
-    chrome.storage.sync.set({ blockedWords: updatedKeywords }, () => {
-      console.log("Updated Keywords Saved:", updatedKeywords); // Log updated list
-      alert("Keywords updated!");
-    });
+  chrome.storage.sync.set({ blockedWords: keywords }, () => {
+    console.log("Updated Keywords Saved:", keywords); // Log updated list
+    alert("Keywords updated!");
   });
 });
