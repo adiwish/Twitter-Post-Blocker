@@ -1,10 +1,18 @@
-// Load existing keywords into the input field on popup load
+// Load existing keywords and blocked count into the popup
 document.addEventListener("DOMContentLoaded", () => {
-  chrome.storage.sync.get("blockedWords", ({ blockedWords }) => {
-    if (blockedWords && blockedWords.length > 0) {
-      document.getElementById("keywords").value = blockedWords.join(", ");
+  // Load blocked words into the input field
+  chrome.storage.sync.get(
+    ["blockedWords", "blockedCount"],
+    ({ blockedWords, blockedCount }) => {
+      if (blockedWords && blockedWords.length > 0) {
+        document.getElementById("keywords").value = blockedWords.join(", ");
+      }
+
+      // Display blocked count
+      const counter = document.getElementById("counter");
+      counter.textContent = `Posts Blocked: ${blockedCount || 0}`;
     }
-  });
+  );
 });
 
 // Save updated keywords when "Done" is clicked
