@@ -1,8 +1,8 @@
-let blockedCount = 0; // Initialize blocked count
+let blockedCount = 0; 
 
 function blockTweets() {
-  chrome.storage.sync.get("blockedWords", ({ blockedWords }) => {
-    console.log("Blocked Words in content.js:", blockedWords); // Debugging
+  chrome.storage.local.get("blockedWords", ({ blockedWords }) => {
+    console.log("Blocked Words in content.js:", blockedWords); 
 
     if (!blockedWords || blockedWords.length === 0) return;
 
@@ -16,18 +16,18 @@ function blockTweets() {
       if (containsBlockedWord) {
         console.log("Blocking Tweet:", tweetText);
 
-        // Replace content with a placeholder
+        
         tweet.innerHTML = `
           <div style="text-align: center; color: gray; font-style: italic; margin: 10px 0;">
             This post was removed by Twitter Post Blocker
           </div>
         `;
-        tweet.style.backgroundColor = "#f5f5f5"; // Optional styling
+        tweet.style.backgroundColor = "#f5f5f5"; 
 
-        blockedCount++; // Increment blocked count
+        blockedCount++; 
 
-        // Save the updated count to storage
-        chrome.storage.sync.set({ blockedCount });
+        
+        chrome.storage.local.set({ blockedCount });
       }
     });
   });
@@ -52,6 +52,7 @@ function addButtonsToPosts() {
     sadButton.style.border = "none";
     sadButton.style.cursor = "pointer";
     sadButton.style.marginLeft = "8px";
+    sadButton.title = "Not Interested";
 
     const blockButton = document.createElement("button");
     blockButton.textContent = "🚫";
@@ -60,6 +61,7 @@ function addButtonsToPosts() {
     blockButton.style.border = "none";
     blockButton.style.cursor = "pointer";
     blockButton.style.marginLeft = "8px";
+    blockButton.title = "Block User";
 
     const muteButton = document.createElement("button");
     muteButton.textContent = "🔕";
@@ -68,6 +70,7 @@ function addButtonsToPosts() {
     muteButton.style.border = "none";
     muteButton.style.cursor = "pointer";
     muteButton.style.marginLeft = "8px";
+    muteButton.title = "Mute User";
 
     const actionBar = post.querySelector('[role="group"]');
 
@@ -75,7 +78,6 @@ function addButtonsToPosts() {
       actionBar.appendChild(sadButton);
       actionBar.appendChild(muteButton);
       actionBar.appendChild(blockButton);
-      
 
       sadButton.addEventListener("click", () => {
         const menuButton = post.querySelector('[aria-label="More"]');
@@ -101,7 +103,7 @@ function addButtonsToPosts() {
       blockButton.addEventListener("click", () => {
         const menuButton = post.querySelector('[aria-label="More"]');
         if (menuButton) {
-          menuButton.click(); 
+          menuButton.click();
           setTimeout(() => {
             const blockButtonMenu = Array.from(
               document.querySelectorAll('[role="menuitem"] span')
@@ -114,28 +116,27 @@ function addButtonsToPosts() {
                 );
                 if (confirmBlockButton) {
                   confirmBlockButton.click(); // Confirm the block in the pop-up
-                  blockButton.remove(); 
+                  blockButton.remove();
                 }
               }, 500); // Wait for the confirmation dialog to appear
             }
-          }, 500); 
+          }, 500);
         }
       });
-
 
       muteButton.addEventListener("click", () => {
         const menuButton = post.querySelector('[aria-label="More"]');
         if (menuButton) {
-          menuButton.click(); 
+          menuButton.click();
           setTimeout(() => {
             const muteButtonMenu = Array.from(
               document.querySelectorAll('[role="menuitem"] span')
             ).find((el) => el.textContent.includes("Mute"));
             if (muteButtonMenu) {
               muteButtonMenu.click();
-              muteButton.remove(); 
+              muteButton.remove();
             }
-          }, 500); 
+          }, 500);
         }
       });
     }
