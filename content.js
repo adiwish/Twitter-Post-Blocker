@@ -84,17 +84,9 @@ function addButtonsToPosts() {
         if (menuButton) {
           menuButton.click(); // Open the three-dot menu
           setTimeout(() => {
-            const notInterestedButton = document.querySelector(
-              '[role="menuitem"] span'
-            );
-            if (
-              notInterestedButton &&
-              notInterestedButton.textContent.includes(
-                "Not interested in this post"
-              )
-            ) {
+            const notInterestedButton =  Array.from(document.querySelectorAll('[role="menuitem"]')).find(el => el.textContent.trim() === "Not interested in this post");
+            if(notInterestedButton){
               notInterestedButton.click();
-              sadButton.remove(); // Remove the emoji after action
             }
           }, 500); // Wait for the menu to open
         }
