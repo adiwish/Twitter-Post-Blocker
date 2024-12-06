@@ -1,8 +1,8 @@
-let blockedCount = 0; 
+let blockedCount = 0;
 
 function blockTweets() {
   chrome.storage.local.get("blockedWords", ({ blockedWords }) => {
-    console.log("Blocked Words in content.js:", blockedWords); 
+    console.log("Blocked Words in content.js:", blockedWords);
 
     if (!blockedWords || blockedWords.length === 0) return;
 
@@ -16,20 +16,27 @@ function blockTweets() {
       if (containsBlockedWord) {
         console.log("Blocking Tweet:", tweetText);
 
-        
         tweet.innerHTML = `
           <div style="text-align: center; color: gray; font-style: italic; margin: 10px 0;">
             This post was removed by Twitter Post Blocker
           </div>
         `;
-        tweet.style.backgroundColor = "#f5f5f5"; 
+        tweet.style.backgroundColor = "#f5f5f5";
 
-        blockedCount++; 
+        blockedCount++;
 
-        
         chrome.storage.local.set({ blockedCount });
       }
     });
+  });
+}
+
+function createButton(text, className, title) {
+  return Object.assign(document.createElement("button"), {
+    textContent: text,
+    className: className,
+    title: title,
+    style: "background: none; border: none; cursor: pointer; margin-left: 8px;",
   });
 }
 
@@ -45,33 +52,6 @@ function addButtonsToPosts() {
     )
       return;
 
-    const sadButton = document.createElement("button");
-    sadButton.textContent = "☹️";
-    sadButton.className = "sad-button";
-    sadButton.style.background = "none";
-    sadButton.style.border = "none";
-    sadButton.style.cursor = "pointer";
-    sadButton.style.marginLeft = "8px";
-    sadButton.title = "Not Interested";
-
-    const blockButton = document.createElement("button");
-    blockButton.textContent = "🚫";
-    blockButton.className = "block-button";
-    blockButton.style.background = "none";
-    blockButton.style.border = "none";
-    blockButton.style.cursor = "pointer";
-    blockButton.style.marginLeft = "8px";
-    blockButton.title = "Block User";
-
-    const muteButton = document.createElement("button");
-    muteButton.textContent = "🔕";
-    muteButton.className = "mute-button";
-    muteButton.style.background = "none";
-    muteButton.style.border = "none";
-    muteButton.style.cursor = "pointer";
-    muteButton.style.marginLeft = "8px";
-    muteButton.title = "Mute User";
-
     const actionBar = post.querySelector('[role="group"]');
 
     if (actionBar) {
@@ -79,13 +59,22 @@ function addButtonsToPosts() {
       actionBar.appendChild(muteButton);
       actionBar.appendChild(blockButton);
 
+      const sadButton = createButton("😢", "sad-button", "Not Interested");
+      const muteButton = createButton("🔕", "mute-button", "Mute User");
+      const blockButton = createButton("🚫", "block-button", "Block User");
+
+      const menuButton = post.querySelector('[aria-label="More"]');
+
       sadButton.addEventListener("click", () => {
-        const menuButton = post.querySelector('[aria-label="More"]');
         if (menuButton) {
           menuButton.click(); // Open the three-dot menu
           setTimeout(() => {
-            const notInterestedButton =  Array.from(document.querySelectorAll('[role="menuitem"]')).find(el => el.textContent.trim() === "Not interested in this post");
-            if(notInterestedButton){
+            const notInterestedButton = Array.from(
+              document.querySelectorAll('[role="menuitem"]')
+            ).find(
+              (el) => el.textContent.trim() === "Not interested in this post"
+            );
+            if (notInterestedButton) {
               notInterestedButton.click();
             }
           }, 500); // Wait for the menu to open
@@ -93,7 +82,6 @@ function addButtonsToPosts() {
       });
 
       blockButton.addEventListener("click", () => {
-        const menuButton = post.querySelector('[aria-label="More"]');
         if (menuButton) {
           menuButton.click();
           setTimeout(() => {
@@ -117,7 +105,6 @@ function addButtonsToPosts() {
       });
 
       muteButton.addEventListener("click", () => {
-        const menuButton = post.querySelector('[aria-label="More"]');
         if (menuButton) {
           menuButton.click();
           setTimeout(() => {
